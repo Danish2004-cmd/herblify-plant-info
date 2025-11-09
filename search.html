@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Search Results - Herblify{% endblock %}
+
+{% block content %}
+<div class="search-header">
+    <h2>Search Results</h2>
+    <form action="{{ url_for('search') }}" method="GET" class="inline-search-form">
+        <input 
+            type="text" 
+            name="q" 
+            value="{{ query }}" 
+            placeholder="Search plants..." 
+            class="inline-search-input"
+            required
+        >
+        <button type="submit" class="inline-search-button">Search</button>
+    </form>
+</div>
+
+{% if query %}
+    {% if plants %}
+        <p class="results-count">Found {{ plants|length }} plant(s) matching "{{ query }}"</p>
+        
+        <div class="results-grid">
+            {% for plant in plants %}
+            <a href="{{ url_for('plant_detail', plant_id=plant.id) }}" class="plant-card">
+                <div class="plant-card-header">
+                    <h3>{{ plant.common_name }}</h3>
+                    <span class="category-badge">{{ plant.category }}</span>
+                </div>
+                <p class="scientific-name-card">{{ plant.scientific_name }}</p>
+                <p class="plant-preview">{{ plant.uses[:150] }}{% if plant.uses|length > 150 %}...{% endif %}</p>
+                <span class="read-more">View Details →</span>
+            </a>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="no-results">
+            <div class="no-results-icon">🔍</div>
+            <h3>No plants found</h3>
+            <p>Try searching with different keywords or check your spelling.</p>
+            <a href="{{ url_for('index') }}" class="back-button">← Back to Home</a>
+        </div>
+    {% endif %}
+{% else %}
+    <div class="no-results">
+        <div class="no-results-icon">🌿</div>
+        <h3>Enter a search term</h3>
+        <p>Please enter a plant name to search our database.</p>
+        <a href="{{ url_for('index') }}" class="back-button">← Back to Home</a>
+    </div>
+{% endif %}
+{% endblock %}

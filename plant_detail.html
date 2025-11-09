@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}{{ plant.common_name }} - Herblify{% endblock %}
+
+{% block content %}
+<div class="breadcrumb">
+    <a href="{{ url_for('index') }}">Home</a> / 
+    <span>{{ plant.common_name }}</span>
+</div>
+
+<div class="plant-detail">
+    <div class="plant-header">
+        <div>
+            <h2>{{ plant.common_name }}</h2>
+            <p class="scientific-name-detail">{{ plant.scientific_name }}</p>
+        </div>
+        <span class="category-badge-large">{{ plant.category }}</span>
+    </div>
+
+    <div class="detail-grid">
+        <div class="detail-section">
+            <h3>
+                <span class="section-icon">💊</span>
+                Uses & Applications
+            </h3>
+            <p class="detail-text">{{ plant.uses }}</p>
+        </div>
+
+        <div class="detail-section">
+            <h3>
+                <span class="section-icon">🌍</span>
+                Habitat & Growing Conditions
+            </h3>
+            <p class="detail-text">{{ plant.habitat }}</p>
+        </div>
+    </div>
+
+    <div class="detail-actions">
+        <a href="{{ url_for('index') }}" class="action-button secondary">← Back to Search</a>
+    </div>
+</div>
+{% endblock %}

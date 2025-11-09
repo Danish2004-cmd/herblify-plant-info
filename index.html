@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block title %}Herblify - Plant Database{% endblock %}
+
+{% block content %}
+<div class="hero-section">
+    <h2>Discover the World of Plants</h2>
+    <p class="hero-subtitle">Search our database of 500+ plants with detailed botanical information</p>
+    
+    <div class="search-container">
+        <form action="{{ url_for('search') }}" method="GET" class="search-form">
+            <div class="search-input-wrapper">
+                <input 
+                    type="text" 
+                    id="searchInput" 
+                    name="q" 
+                    placeholder="Search by common or scientific name..." 
+                    class="search-input"
+                    autocomplete="off"
+                    required
+                >
+                <button type="submit" class="search-button">Search</button>
+            </div>
+            <div id="suggestions" class="suggestions-dropdown"></div>
+        </form>
+    </div>
+</div>
+
+<div class="info-section">
+    <h3>What You'll Find</h3>
+    <div class="info-grid">
+        <div class="info-card">
+            <div class="info-icon">🌱</div>
+            <h4>Common Names</h4>
+            <p>Easily recognizable plant names used in everyday language</p>
+        </div>
+        <div class="info-card">
+            <div class="info-icon">🔬</div>
+            <h4>Scientific Names</h4>
+            <p>Accurate botanical nomenclature for academic research</p>
+        </div>
+        <div class="info-card">
+            <div class="info-icon">💊</div>
+            <h4>Uses & Benefits</h4>
+            <p>Medicinal, culinary, and practical applications</p>
+        </div>
+        <div class="info-card">
+            <div class="info-icon">🌍</div>
+            <h4>Habitat Details</h4>
+            <p>Natural environment and growing conditions</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const searchInput = document.getElementById('searchInput');
+    const suggestionsDiv = document.getElementById('suggestions');
+    let debounceTimer;
+
+    searchInput.addEventListener('input', function() {
+        clearTimeout(debounceTimer);
+        const query = this.value.trim();
+        
+        if (query.length < 2) {
+            suggestionsDiv.style.display = 'none';
+            return;
+        }
+
+        debounceTimer = setTimeout(() => {
+            fetch(`/api/search?q=${encodeURIComponent(query)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.length === 0) {
+                        suggestionsDiv.style.display = 'none';
+                        return;
+                    }
+
+                    suggestionsDiv.innerHTML = data.map(plant => `
+                        <a href="/plant/${plant.id}" class="suggestion-item">
+                            <strong>${plant.common_name}</strong>
+                            <span class="scientific-name">${plant.scientific_name}</span>
+                        </a>
+                    `).join('');
+                    suggestionsDiv.style.display = 'block';
+                })
+                .catch(error => {
+                    console.error('Error fetching suggestions:', error);
+                });
+        }, 300);
+    });
+
+    document.addEventListener('click', function(e) {
+        if (!searchInput.contains(e.target) && !suggestionsDiv.contains(e.target)) {
+            suggestionsDiv.style.display = 'none';
+        }
+    });
+</script>
+{% endblock %}
